@@ -1,12 +1,18 @@
 /**
  * devtools/timeline.ts
  *
- * Timeline helpers for LunaDevTools.
- * Scrubs 0–29.53 days (one lunar cycle) instead of 0–1439 minutes (one day).
+ * Helpers for LunaDevTools.
+ *
+ * LunaDevTools uses two independent controls instead of a single age slider:
+ *   Phase picker  — selects which of the 8 phases to preview (monthly axis)
+ *   Arc slider    — moves the orb along tonight's arc, 0=rising 1=setting (daily axis)
+ *
+ * simulatedDateForPhaseAndProgress() is the key function — it crafts a Date
+ * that satisfies both axes simultaneously, so the widget sees the right phase
+ * AND the right arc position without any wrap-around jumps.
  */
 
 import type { LunarPhase } from '../hooks/useLunarPosition';
-import type { LunarSkinPalettes } from '../skins/types/luna-skin.types';
 
 export const LUNAR_CYCLE_DAYS = 29.53058770576;
 
@@ -21,7 +27,7 @@ export const PHASES: LunarPhase[] = [
   'waning-crescent',
 ];
 
-// Phase start positions in days — used for tick marks on the scrubber
+// Phase start positions in days — used for reference / tick marks
 export const PHASE_STARTS: Record<LunarPhase, number> = {
   new: 0,
   'waxing-crescent': 1.85,
@@ -31,6 +37,22 @@ export const PHASE_STARTS: Record<LunarPhase, number> = {
   'waning-gibbous': 16.61,
   'last-quarter': 22.15,
   'waning-crescent': 23.99,
+};
+
+/**
+ * Midpoint age for each phase in days.
+ * DevTools parks here when a phase is selected — the moon is deep in the
+ * phase, not near a boundary, so illumination reads cleanly.
+ */
+export const PHASE_MIDPOINTS: Record<LunarPhase, number> = {
+  new: 0.5,
+  'waxing-crescent': 4.0,
+  'first-quarter': 8.3,
+  'waxing-gibbous': 12.0,
+  full: 15.7,
+  'waning-gibbous': 19.4,
+  'last-quarter': 23.1,
+  'waning-crescent': 26.0,
 };
 
 export function phaseForAge(ageInDays: number): LunarPhase {
@@ -51,22 +73,33 @@ export function formatAge(days: number): string {
   return h > 0 ? `Day ${d}+${h}h` : `Day ${d}`;
 }
 
+// Reference new moon: January 6, 2000 18:14 UTC
+const REFERENCE_NEW_MOON_MS = 947182440000;
+
 /**
- * Builds the gradient for the scrubber track.
- * Goes black → dark → silver-blue (full) → dark → black.
- * Driven by the active skin's lunar palettes.
+ * Build a simulated Date that places the moon at the midpoint of `phase`
+ * with the orb at `progress` along tonight's arc.
+ *
+ *   progress 0.0 → rising  (left of arc)
+ *   progress 0.5 → zenith  (top of arc)
+ *   progress 1.0 → setting (right of arc)
+ *
+ * This decouples the two cycles explicitly so DevTools can control them
+ * independently without triggering the snap logic in the orb RAF hooks:
+ *   - Phase (monthly axis) → PHASE_MIDPOINTS[phase]
+ *   - Arc position (daily axis) → time-of-day offset from moonrise
  */
-export function buildLunaSliderGradient(palettes: LunarSkinPalettes): string {
-  return `linear-gradient(90deg, ${[
-    palettes.new.bg[1],
-    palettes['waxing-crescent'].bg[1],
-    palettes['first-quarter'].bg[1],
-    palettes['waxing-gibbous'].bg[1],
-    palettes.full.bg[1],
-    palettes.full.bg[1], // peak — hold full moon color briefly
-    palettes['waning-gibbous'].bg[1],
-    palettes['last-quarter'].bg[1],
-    palettes['waning-crescent'].bg[1],
-    palettes.new.bg[1],
-  ].join(', ')})`;
+export function simulatedDateForPhaseAndProgress(phase: LunarPhase, progress: number): Date {
+  const midAge = PHASE_MIDPOINTS[phase];
+
+  // Moonrise shifts ~50 min/day. New moon rises at ~6am (360 min from midnight).
+  const dayDelay = (midAge / 29.53) * 24 * 60;
+  const moonriseMinutes = (360 + dayDelay) % (24 * 60);
+
+  // Moon is visible for ~12 hours (720 min). Map progress → minutes after rise.
+  const targetMinutes = (moonriseMinutes + progress * 720) % (24 * 60);
+
+  const d = new Date(REFERENCE_NEW_MOON_MS + midAge * 24 * 60 * 60 * 1000);
+  d.setUTCHours(Math.floor(targetMinutes / 60), Math.round(targetMinutes % 60), 0, 0);
+  return d;
 }

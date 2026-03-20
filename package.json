@@ -35,7 +35,9 @@
       "default": "./dist/devtools/index.js",
       "types": "./dist/devtools/index.d.ts"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./styles-no-preflight.css": "./dist/styles-no-preflight.css"
+
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -45,7 +47,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsdown && bunx @tailwindcss/cli -i src/styles.css -o dist/styles.css --minify",
+    "build": "tsdown && bunx @tailwindcss/cli -i src/styles.css -o dist/styles.css --minify && bunx @tailwindcss/cli -i src/styles-no-preflight.css -o dist/styles-no-preflight.css --minify",
     "dev": "concurrently \"tsdown --watch\" \"bunx @tailwindcss/cli -i src/styles.css -o dist/styles.css --watch\"",
     "typecheck": "tsc --noEmit --pretty",
     "lint": "biome check --error-on-warnings ./src",
