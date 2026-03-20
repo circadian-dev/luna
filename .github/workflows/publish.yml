@@ -1,0 +1,71 @@
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Version bump type"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+          - none
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          fetch-depth: 0
+
+      - name: Pull latest
+        run: git pull --rebase origin main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+
+      - name: Configure npm Auth
+        run: echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > ~/.npmrc
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.16
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: Set Git Config
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump Version
+        run: |
+          if [ "${{ inputs.version_type }}" != "none" ]; then
+            npm version ${{ inputs.version_type }} --no-git-tag-version
+          fi
+          echo "NEW_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+
+      - name: Commit & Tag
+        run: |
+          git add package.json
+          git commit -m "${{ env.NEW_VERSION }}" --allow-empty
+          git tag -a "${{ env.NEW_VERSION }}" -m "${{ env.NEW_VERSION }}"
+          git push origin main
+          git push origin "${{ env.NEW_VERSION }}" --force
+
+      - name: Publish to npm
+        run: npm publish --access public

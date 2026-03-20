@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@import "tw-animate-css";
+
+@source "./skins/**/*.tsx";
+@source "./widgets/**/*.tsx";
+@source "./provider/**/*.tsx";
+@source "./hooks/**/*.tsx";
+
+@source "./";
