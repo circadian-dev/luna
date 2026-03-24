@@ -212,6 +212,7 @@ function SilverInkWashTrack({
   accentColor,
   pillBorder,
   illumination,
+  isVisible,
   progress,
 }: {
   trackW: number;
@@ -221,9 +222,10 @@ function SilverInkWashTrack({
   accentColor: string;
   pillBorder: string;
   illumination: number;
+  isVisible: boolean;
   progress: number;
 }) {
-  const orbOpacity = Math.max(0.06, illumination * 0.94 + 0.06);
+  const orbOpacity = isVisible ? Math.max(0.06, illumination * 0.94 + 0.06) : 0;
   const orbR = trackH * 0.45 * (0.5 + illumination * 0.5);
   const lineY = trackH / 2 + trackH * 0.05;
   const initX = Math.max(0.01, Math.min(0.99, progress)) * trackW;
@@ -323,7 +325,7 @@ function SilverInkWashTrack({
       />
 
       {/* Ink blot wrap — fades on wrap-around */}
-      <g ref={wrapRef} style={{ opacity: orbOpacity, transition: 'opacity 0.9s ease-in-out' }}>
+      <g ref={wrapRef} style={{ opacity: orbOpacity, transition: 'opacity 1.2s ease-in-out' }}>
         <circle
           ref={outerRef}
           cx={initX}
@@ -406,9 +408,7 @@ export function PaperLunaCompact({
   const moonsetStr = fmtMinutes(lunarPos.moonsetMinutes);
   const illumPct = Math.round(lunarPos.illumination * 100);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   const trackW = size.width - size.px * 2;
   const row1H = size.labelSize + 2;
@@ -536,6 +536,7 @@ export function PaperLunaCompact({
             accentColor={pal.accentColor}
             pillBorder={pal.pillBorder}
             illumination={lunarPos.illumination}
+            isVisible={lunarPos.isVisible}
             progress={progressTarget}
           />
         </div>

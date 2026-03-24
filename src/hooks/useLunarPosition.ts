@@ -144,7 +144,7 @@ function gmstDeg(date: Date): number {
 // ─── UTC offset from IANA timezone ───────────────────────────────────────────
 // Mirrors Sol's utcOffsetFromTimezone exactly.
 
-function utcOffsetFromTimezone(tz: string, at?: Date): number {
+export function utcOffsetFromTimezone(tz: string, at?: Date): number {
   try {
     const now = at ?? new Date();
     const formatter = new Intl.DateTimeFormat('en', {
@@ -170,7 +170,7 @@ function utcOffsetFromTimezone(tz: string, at?: Date): number {
 // Moon's effective rise/set altitude: ~0.125° (mean parallax 0.95° minus
 // refraction 0.583° minus angular radius 0.267° ≈ 0.1°, rounded to 0.125°).
 
-function getMoonriseMoonset(
+export function getMoonriseMoonset(
   date: Date,
   latDeg: number,
   lonDeg: number,

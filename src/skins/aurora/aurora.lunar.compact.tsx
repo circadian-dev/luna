@@ -381,9 +381,7 @@ export function AuroraLunaCompact({
   const moonsetStr = fmtMinutes(lunarPos.moonsetMinutes);
   const illumPct = Math.round(lunarPos.illumination * 100);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   const trackW = size.width - size.px * 2;
   const row1H = size.labelSize + 2;

@@ -12,9 +12,18 @@
  * AND the right arc position without any wrap-around jumps.
  */
 
-import type { LunarPhase } from '../hooks/useLunarPosition';
+import {
+  type LunarPhase,
+  getMoonriseMoonset,
+  utcOffsetFromTimezone,
+} from '../hooks/useLunarPosition';
 
 export const LUNAR_CYCLE_DAYS = 29.53058770576;
+
+// Defaults mirror useLunarPosition defaults
+const DEFAULT_LAT = 51.5074;
+const DEFAULT_LON = -0.1278;
+const DEFAULT_TZ = 'Europe/London';
 
 export const PHASES: LunarPhase[] = [
   'new',
@@ -87,19 +96,33 @@ const REFERENCE_NEW_MOON_MS = 947182440000;
  * This decouples the two cycles explicitly so DevTools can control them
  * independently without triggering the snap logic in the orb RAF hooks:
  *   - Phase (monthly axis) → PHASE_MIDPOINTS[phase]
- *   - Arc position (daily axis) → time-of-day offset from moonrise
+ *   - Arc position (daily axis) → time-of-day offset from real moonrise
+ *
+ * Key invariant: the returned Date always has the moon above the horizon,
+ * so getMoonProgress() returns { progress: P, isVisible: true }.
  */
 export function simulatedDateForPhaseAndProgress(phase: LunarPhase, progress: number): Date {
   const midAge = PHASE_MIDPOINTS[phase];
-
-  // Moonrise shifts ~50 min/day. New moon rises at ~6am (360 min from midnight).
-  const dayDelay = (midAge / 29.53) * 24 * 60;
-  const moonriseMinutes = (360 + dayDelay) % (24 * 60);
-
-  // Moon is visible for ~12 hours (720 min). Map progress → minutes after rise.
-  const targetMinutes = (moonriseMinutes + progress * 720) % (24 * 60);
-
   const d = new Date(REFERENCE_NEW_MOON_MS + midAge * 24 * 60 * 60 * 1000);
-  d.setUTCHours(Math.floor(targetMinutes / 60), Math.round(targetMinutes % 60), 0, 0);
+
+  // Compute actual moonrise/moonset using the same algorithm as useLunarPosition
+  const utcOff = utcOffsetFromTimezone(DEFAULT_TZ, d);
+  const { moonrise, moonset } = getMoonriseMoonset(d, DEFAULT_LAT, DEFAULT_LON, utcOff);
+
+  let targetMinutes: number;
+
+  if (moonrise !== null && moonset !== null) {
+    // Compute real visibility duration, handling overnight wrap (set < rise)
+    const duration = moonset < moonrise ? 1440 - moonrise + moonset : moonset - moonrise;
+    targetMinutes = (moonrise + progress * duration) % 1440;
+  } else {
+    // Fallback for circumpolar edge cases — rough estimate
+    const dayDelay = (midAge / 29.53) * 24 * 60;
+    const moonriseEst = (360 + dayDelay) % 1440;
+    targetMinutes = (moonriseEst + progress * 720) % 1440;
+  }
+
+  // setHours (local) — matches getMoonProgress which reads date.getHours()
+  d.setHours(Math.floor(targetMinutes / 60), Math.round(targetMinutes % 60), 0, 0);
   return d;
 }

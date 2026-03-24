@@ -880,9 +880,7 @@ export function MineralLunarWidget({
   const { setTarget } = useMineralLunaOrbRaf(facetGroupRef);
 
   const orbOpacity = Math.max(0.08, lunarPos.illumination * 0.92 + 0.08);
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
   const isWaning = isWaningPhase(lunarPos.phase);
 
   useEffect(() => {
@@ -991,9 +989,9 @@ export function MineralLunarWidget({
                   className="absolute inset-0"
                   style={{
                     zIndex: 3,
-                    overflow: 'visible',
+                    overflow: 'hidden',
                     opacity: orbOpacity,
-                    transition: 'opacity 1.8s ease-in-out',
+                    transition: 'opacity 1.2s ease-in-out',
                   }}
                   width={W}
                   height={H}

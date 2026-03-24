@@ -537,9 +537,9 @@ export function SignalLunarWidget({
   const reticleGroupRef = useRef<SVGGElement>(null);
   const { setTarget } = useSignalLunaReticleRaf(reticleGroupRef);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const orbOpacity = lunarPos.isVisible ? Math.max(0.06, lunarPos.illumination * 0.94 + 0.06) : 0;
+
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   useEffect(() => {
     // Update reticle accent color
@@ -637,7 +637,11 @@ export function SignalLunarWidget({
                     strokeDasharray="6 10"
                     strokeOpacity="0.55"
                   />
-                  <g ref={reticleGroupRef} transform={`translate(${initPos.x},${initPos.y})`}>
+                  <g
+                    ref={reticleGroupRef}
+                    style={{ opacity: orbOpacity, transition: 'opacity 1.2s ease-in-out' }}
+                    transform={`translate(${initPos.x},${initPos.y})`}
+                  >
                     <Reticle accent={palette.accent} size={13} />
                   </g>
                 </svg>

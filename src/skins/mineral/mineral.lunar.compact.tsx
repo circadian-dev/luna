@@ -305,6 +305,7 @@ function MineralLunaFacetTrack({
   pillBorder,
   illumination,
   isWaning,
+  isVisible,
 }: {
   progress: number;
   trackW: number;
@@ -316,6 +317,7 @@ function MineralLunaFacetTrack({
   pillBorder: string;
   illumination: number;
   isWaning: boolean;
+  isVisible: boolean;
 }) {
   const midY = trackH / 2;
   const gemSize = trackH * 0.38;
@@ -387,7 +389,7 @@ function MineralLunaFacetTrack({
       })}
 
       {/* Orb wrap group */}
-      <g ref={wrapGRef} style={{ opacity: orbOpacity, transition: 'opacity 0.9s ease-in-out' }}>
+      <g ref={wrapGRef} style={{ opacity: orbOpacity, transition: 'opacity 1.2s ease-in-out' }}>
         <g ref={orbGroupRef} transform={`translate(${initX},${midY})`}>
           <circle
             r={gemSize * 1.6}
@@ -451,9 +453,7 @@ export function MineralLunaCompact({
   const illumPct = Math.round(lunarPos.illumination * 100);
   const isWaning = isWaningPhase(lunarPos.phase);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   const trackW = size.width - size.px * 2;
   const row1H = size.labelSize + 2;
@@ -602,6 +602,7 @@ export function MineralLunaCompact({
             pillBorder={pal.pillBorder}
             illumination={lunarPos.illumination}
             isWaning={isWaning}
+            isVisible={lunarPos.isVisible}
           />
         </div>
 

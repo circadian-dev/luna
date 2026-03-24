@@ -662,9 +662,9 @@ export function ParchmentLunarWidget({
   // but stays restrained (no bloom). This is the manuscript aesthetic.
   const orbR = 5 + lunarPos.illumination * 1.5;
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const orbOpacity = lunarPos.isVisible ? Math.max(0.06, lunarPos.illumination * 0.94 + 0.06) : 0;
+
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   useEffect(() => {
     if (orbRef.current) orbRef.current.setAttribute('r', String(orbR));
@@ -785,7 +785,10 @@ export function ParchmentLunarWidget({
                     cy={initPos.y}
                     r={orbR}
                     fill={INK_MED}
-                    style={{ transition: 'r 1.8s ease-in-out' }}
+                    style={{
+                      transition: 'r 1.8s ease-in-out, opacity 1.2s ease-in-out',
+                      opacity: orbOpacity,
+                    }}
                   />
                 </svg>
 

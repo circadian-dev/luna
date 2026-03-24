@@ -201,6 +201,7 @@ function MeridianLunaHairlineTrack({
   accentColor,
   arc,
   illumination,
+  isVisible,
 }: {
   progress: number;
   trackW: number;
@@ -210,11 +211,12 @@ function MeridianLunaHairlineTrack({
   accentColor: string;
   arc: string;
   illumination: number;
+  isVisible: boolean;
 }) {
   const cy = trackH / 2;
   const dotR = 2.5 + illumination * 2.5;
   const ringR = dotR + 3 + illumination * 3;
-  const orbOpacity = Math.max(0.06, illumination * 0.94 + 0.06);
+  const orbOpacity = isVisible ? Math.max(0.06, illumination * 0.94 + 0.06) : 0;
 
   const ringRef = useRef<SVGCircleElement>(null);
   const dotRef = useRef<SVGCircleElement>(null);
@@ -276,7 +278,7 @@ function MeridianLunaHairlineTrack({
       })}
 
       {/* Orb wrap group */}
-      <g ref={wrapRef} style={{ opacity: orbOpacity, transition: 'opacity 0.9s ease-in-out' }}>
+      <g ref={wrapRef} style={{ opacity: orbOpacity, transition: 'opacity 1.2s ease-in-out' }}>
         {/* Stroke ring */}
         <circle
           ref={ringRef}
@@ -333,9 +335,7 @@ export function MeridianLunaCompact({
   const moonsetStr = fmtMinutes(lunarPos.moonsetMinutes);
   const illumPct = Math.round(lunarPos.illumination * 100);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   const trackW = size.width - size.px * 2;
   const row1H = size.labelSize + 2;
@@ -441,6 +441,7 @@ export function MeridianLunaCompact({
             accentColor={pal.accentColor}
             arc={pal.arc}
             illumination={lunarPos.illumination}
+            isVisible={lunarPos.isVisible}
           />
         </div>
 

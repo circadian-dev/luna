@@ -212,11 +212,13 @@ function VellumTrack({
   trackW,
   trackH,
   illumination,
+  orbOpacity,
 }: {
   progress: number;
   trackW: number;
   trackH: number;
   illumination: number;
+  orbOpacity: number;
 }) {
   const orbR = 4 + illumination * 1.5;
   const lineY = trackH / 2;
@@ -275,7 +277,7 @@ function VellumTrack({
       <rect ref={fillRef} x={0} y={lineY - 0.5} width={initX} height={1} fill={INK_GHOST} />
 
       {/* Ink dot — the moon's current position */}
-      <g ref={wrapGRef} style={{ transition: 'opacity 0.9s ease-in-out' }}>
+      <g ref={wrapGRef} style={{ opacity: orbOpacity, transition: 'opacity 1.2s ease-in-out' }}>
         <circle ref={orbDotRef} cx={initX} cy={lineY} r={orbR} fill={INK_MED} />
       </g>
     </svg>
@@ -319,9 +321,9 @@ export function ParchmentLunaCompact({
   const moonsetStr = fmtMinutes(lunarPos.moonsetMinutes);
   const illumPct = Math.round(lunarPos.illumination * 100);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
+
+  const orbOpacity = lunarPos.isVisible ? Math.max(0.06, lunarPos.illumination * 0.94 + 0.06) : 0;
 
   const trackW = size.width - size.px * 2;
   const row1H = size.labelSize + 2;
@@ -441,6 +443,7 @@ export function ParchmentLunaCompact({
             trackW={trackW}
             trackH={size.trackH}
             illumination={lunarPos.illumination}
+            orbOpacity={orbOpacity}
           />
         </div>
 

@@ -273,7 +273,7 @@ function VoidLunaTrack({
       />
 
       {/* Orb wrap group — fades on wrap-around */}
-      <g ref={wrapGRef} style={{ opacity: orbOpacity, transition: 'opacity 0.9s ease-in-out' }}>
+      <g ref={wrapGRef} style={{ opacity: orbOpacity, transition: 'opacity 1.2s ease-in-out' }}>
         <circle
           ref={glowRef}
           cx={initX}
@@ -344,16 +344,14 @@ export function VoidLunaCompact({
   const illumPct = Math.round(lunarPos.illumination * 100);
 
   // Orb metrics scale with illumination — near-invisible at new moon
-  const orbOpacity = Math.max(0.06, lunarPos.illumination * 0.94 + 0.06);
+  const orbOpacity = lunarPos.isVisible ? Math.max(0.06, lunarPos.illumination * 0.94 + 0.06) : 0;
   const trackW = size.width - size.px * 2;
   const orbR = size.trackH * 0.38;
   const glowR = orbR * (2.5 * lunarPos.illumination + 0.5);
   const midR = orbR * (1.4 * lunarPos.illumination + 0.3);
   const coreR = orbR * (0.8 + lunarPos.illumination * 0.2);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   const row1H = size.labelSize + 2;
   const row3H = size.timeSize + 2;

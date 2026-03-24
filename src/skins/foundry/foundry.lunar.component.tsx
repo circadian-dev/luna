@@ -632,14 +632,12 @@ export function FoundryLunarWidget({
   });
 
   // Orb scale driven by illumination
-  const orbOpacity = Math.max(0.06, lunarPos.illumination * 0.94 + 0.06);
+  const orbOpacity = lunarPos.isVisible ? Math.max(0.06, lunarPos.illumination * 0.94 + 0.06) : 0;
   const glowR = 56 * lunarPos.illumination + 8;
   const midR = 26 * lunarPos.illumination + 5;
   const coreR = 5 + lunarPos.illumination * 4;
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   useEffect(() => {
     if (haloRef.current) {
@@ -788,7 +786,8 @@ export function FoundryLunarWidget({
                   style={{
                     zIndex: 3,
                     opacity: orbOpacity,
-                    transition: 'opacity 1.8s ease-in-out',
+                    transition: 'opacity 1.2s ease-in-out',
+                    overflow: 'hidden',
                   }}
                   width={W}
                   height={H}

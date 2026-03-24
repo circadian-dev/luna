@@ -648,13 +648,11 @@ export function PaperLunarWidget({
   const { setTarget } = usePaperLunaOrbRaf({ bloom: bloomRef, center: centerRef });
 
   // Ink bloom scales with illumination — faint at new, full wash at full moon
-  const orbOpacity = Math.max(0.06, lunarPos.illumination * 0.94 + 0.06);
+  const orbOpacity = lunarPos.isVisible ? Math.max(0.06, lunarPos.illumination * 0.94 + 0.06) : 0;
   const bloomR = 22 + lunarPos.illumination * 10;
   const centerR = 5 + lunarPos.illumination * 5;
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   useEffect(() => {
     if (bloomRef.current) {
@@ -768,7 +766,7 @@ export function PaperLunarWidget({
                     zIndex: 2,
                     overflow: 'hidden',
                     opacity: orbOpacity,
-                    transition: 'opacity 1.8s ease-in-out',
+                    transition: 'opacity 1.2s ease-in-out',
                   }}
                   width={W}
                   height={H}

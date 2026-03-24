@@ -229,6 +229,7 @@ function LunaArcTrack({
   tickColor,
   shadowColor,
   illumination,
+  isVisible,
 }: {
   progress: number;
   trackW: number;
@@ -239,6 +240,7 @@ function LunaArcTrack({
   tickColor: string;
   shadowColor: string;
   illumination: number;
+  isVisible: boolean;
 }) {
   const baseY = trackH - 5;
   const topY = trackH * 0.06;
@@ -255,7 +257,7 @@ function LunaArcTrack({
   const progress01 = Math.max(0.01, Math.min(0.99, progress));
   const initOrbX = progress01 * trackW;
   const initOrbY = baseY - arcHeight * 4 * progress01 * (1 - progress01);
-  const orbOpacity = Math.max(0.06, illumination * 0.94 + 0.06);
+  const orbOpacity = isVisible ? Math.max(0.06, illumination * 0.94 + 0.06) : 0;
   const gnomonOpacity = illumination * 0.45;
 
   const orbGroupRef = useRef<SVGGElement>(null);
@@ -364,7 +366,7 @@ function LunaArcTrack({
       />
 
       {/* Orb wrap group */}
-      <g ref={wrapGRef} style={{ opacity: orbOpacity, transition: 'opacity 2.0s ease-in-out' }}>
+      <g ref={wrapGRef} style={{ opacity: orbOpacity, transition: 'opacity 1.2s ease-in-out' }}>
         <g ref={orbGroupRef} transform={`translate(${initOrbX.toFixed(1)},${initOrbY.toFixed(1)})`}>
           <circle
             data-orb-glow
@@ -426,9 +428,7 @@ export function SundialLunaCompact({
   const moonsetStr = fmtMinutes(lunarPos.moonsetMinutes);
   const illumPct = Math.round(lunarPos.illumination * 100);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   const trackW = size.width - size.px * 2;
   const row1H = size.labelSize + 2;
@@ -559,6 +559,7 @@ export function SundialLunaCompact({
             tickColor={pal.tickColor}
             shadowColor={pal.shadowColor}
             illumination={lunarPos.illumination}
+            isVisible={lunarPos.isVisible}
           />
         </div>
 

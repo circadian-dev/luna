@@ -717,13 +717,11 @@ export function MeridianLunarWidget({
   const { setTarget } = useMeridianLunaOrbRaf({ ring: ringRef, dot: dotRef });
 
   // Ring and dot scale with illumination — restrained but present
-  const orbOpacity = Math.max(0.06, lunarPos.illumination * 0.94 + 0.06);
+  const orbOpacity = lunarPos.isVisible ? Math.max(0.06, lunarPos.illumination * 0.94 + 0.06) : 0;
   const dotR = 3.5 + lunarPos.illumination * 3.5;
   const ringR = dotR + 4 + lunarPos.illumination * 4;
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   useEffect(() => {
     if (ringRef.current) {
@@ -838,7 +836,8 @@ export function MeridianLunarWidget({
                   style={{
                     zIndex: 3,
                     opacity: orbOpacity,
-                    transition: 'opacity 1.8s ease-in-out',
+                    transition: 'opacity 1.2s ease-in-out',
+                    overflow: 'hidden',
                   }}
                   width={W}
                   height={H}

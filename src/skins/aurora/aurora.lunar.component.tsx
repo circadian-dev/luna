@@ -745,9 +745,7 @@ export function AuroraLunarWidget({
   const midR = 26 * lunarPos.illumination + 4;
   const coreR = 4 + lunarPos.illumination * 3;
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   useEffect(() => {
     if (glowRef.current) {
@@ -881,7 +879,7 @@ export function AuroraLunarWidget({
                     zIndex: 3,
                     opacity: orbOpacity,
                     transition: 'opacity 2.0s ease-in-out',
-                    overflow: 'visible',
+                    overflow: 'hidden',
                   }}
                   width={W}
                   height={H}

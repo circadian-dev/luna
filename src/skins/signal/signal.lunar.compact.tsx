@@ -208,6 +208,7 @@ function LunarTerminalTrack({
   accentDim,
   illumination,
   moonProgress,
+  isVisible,
   groupRef,
   haloRef,
   wrapGRef,
@@ -219,6 +220,7 @@ function LunarTerminalTrack({
   accentDim: string;
   illumination: number;
   moonProgress: number;
+  isVisible: boolean;
   groupRef: React.RefObject<SVGGElement>;
   haloRef: React.RefObject<SVGCircleElement>;
   wrapGRef: React.RefObject<SVGGElement>;
@@ -226,6 +228,7 @@ function LunarTerminalTrack({
   const midY = trackH / 2;
   const orbR = (trackH * 0.55) / 2;
   const segW = trackW / segs;
+  const orbOpacity = isVisible ? Math.max(0.06, illumination * 0.94 + 0.06) : 0;
   // Blocks filled = illumination percentage
   const filled = Math.round(illumination * segs);
   // Reticle position = moonProgress
@@ -268,7 +271,7 @@ function LunarTerminalTrack({
       })}
 
       {/* Reticle wrap group — fades on wrap-around */}
-      <g ref={wrapGRef} style={{ transition: 'opacity 0.9s ease-in-out' }}>
+      <g ref={wrapGRef} style={{ opacity: orbOpacity, transition: 'opacity 1.2s ease-in-out' }}>
         <circle
           ref={haloRef}
           cx={initX}
@@ -323,9 +326,7 @@ export function SignalLunaCompact({
   const moonsetStr = fmtMinutes(lunarPos.moonsetMinutes);
   const illumPct = Math.round(lunarPos.illumination * 100);
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   const trackW = size.width - size.px * 2;
   const midY = size.trackH / 2;
@@ -486,6 +487,7 @@ export function SignalLunaCompact({
             accentDim={pal.accentDim}
             illumination={lunarPos.illumination}
             moonProgress={progressTarget}
+            isVisible={lunarPos.isVisible}
             groupRef={groupRef}
             haloRef={haloRef}
             wrapGRef={wrapGRef}

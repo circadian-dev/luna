@@ -669,9 +669,7 @@ export function TideLunarWidget({
   const glowR = 20 + lunarPos.illumination * 8;
   const coreR = 7 + lunarPos.illumination * 3;
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   useEffect(() => {
     if (glowRef.current) {

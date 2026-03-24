@@ -658,13 +658,11 @@ export function SundialLunarWidget({
   const { setTarget } = useSundialLunaOrbRaf({ orbGroup: orbGroupRef, gnomon: gnomonRef });
 
   // Orb and gnomon shadow scale with illumination
-  const orbOpacity = Math.max(0.08, lunarPos.illumination * 0.92 + 0.08);
+  const orbOpacity = lunarPos.isVisible ? Math.max(0.08, lunarPos.illumination * 0.92 + 0.08) : 0;
   const gnomonOpacity = lunarPos.illumination * 0.52; // 0 at new → 0.52 at full
   const glowR = 18 + lunarPos.illumination * 8;
 
-  const progressTarget = lunarPos.isVisible
-    ? Math.max(0.01, Math.min(0.99, lunarPos.moonProgress))
-    : 0.5;
+  const progressTarget = Math.max(0.01, Math.min(0.99, lunarPos.moonProgress));
 
   useEffect(() => {
     setTarget(progressTarget);
@@ -783,7 +781,12 @@ export function SundialLunarWidget({
                   role="presentation"
                   aria-hidden
                   className="absolute inset-0"
-                  style={{ zIndex: 4, overflow: 'hidden' }}
+                  style={{
+                    zIndex: 4,
+                    overflow: 'hidden',
+                    opacity: orbOpacity,
+                    transition: 'opacity 1.2s ease-in-out',
+                  }}
                   width={W}
                   height={H}
                   viewBox={`0 0 ${W} ${H}`}
