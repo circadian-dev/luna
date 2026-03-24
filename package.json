@@ -1,6 +1,6 @@
 {
   "name": "@circadian/luna",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Lunar-aware React widgets that follow the real phase of the moon.",
   "homepage": "https://circadian.dev",
