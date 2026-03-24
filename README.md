@@ -418,7 +418,6 @@ The full card widget. Reads its design from the nearest `LunaThemeProvider`.
 ## CompactLunaWidget
 
 <div align="center">
- <img src=".github/compact-banner.png" alt="CompactLunaWidget skins" width="100%"/>
 </div>
 
 The slim pill/bar variant. Always uses the provider's active skin.
@@ -641,6 +640,6 @@ Luna is the second piece of the Circadian platform. Next up:
 
 <div align="center">
 
-MIT © [Circadian](https://circadian.dev)
+MIT © [Circadian] website - coming soon
 
 </div>
