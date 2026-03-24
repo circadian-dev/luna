@@ -13,6 +13,7 @@
 import type { DesignMode } from '@circadian/sol';
 import { type ReactNode, createContext, useCallback, useContext, useState } from 'react';
 import { type LunarPhase, type LunarPosition, useLunarPosition } from '../hooks/useLunarPosition';
+import { injectLunaCSS } from '../lib/inject-luna-css';
 import { LUNA_SKINS } from '../skins/index';
 import type { LunaSkinDefinition } from '../skins/types/luna-skin.types';
 
@@ -72,7 +73,9 @@ export function LunaThemeProvider({
   longitude,
   timezone,
 }: LunaThemeProviderProps) {
-  // ── Skin selection ─────────────────────────────────────────────────────────
+  injectLunaCSS();
+
+  // ── Skin selection ──────────────────────────────────────────
   const [design, setDesignState] = useState<DesignMode>(() => {
     if (typeof window === 'undefined') return initialDesign;
     try {
